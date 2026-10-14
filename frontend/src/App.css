@@ -1,0 +1,290 @@
+
+/* ==============================
+   Global Styles
+============================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+  width: 100%;
+}
+
+body {
+  background-color: #f8fafc;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* ==============================
+   Main Application Layout
+============================== */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f8fafc;
+}
+
+.main-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* ==============================
+   Sidebar Brand
+============================== */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  color: #ffffff;
+  background-color: #4f46e5;
+}
+
+/* ==============================
+   Sidebar Menu
+============================== */
+
+.menu-heading {
+  padding: 24px 24px 8px;
+  color: #9ca3af;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid #293244;
+}
+
+/* ==============================
+   Top Navigation Bar
+============================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 68px;
+  gap: 16px;
+}
+
+/* ==============================
+   Page Content
+============================== */
+
+.page-content {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.welcome-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ==============================
+   Statistics Cards
+============================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  min-width: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px !important;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07) !important;
+}
+
+.stat-card .MuiCardContent-root {
+  padding: 22px;
+}
+
+.stat-card .MuiCardContent-root:last-child {
+  padding-bottom: 22px;
+}
+
+/* ==============================
+   Recent Candidates Card
+============================== */
+
+.candidate-card {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px !important;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+}
+
+.candidate-card .MuiCardContent-root {
+  padding: 24px;
+}
+
+/* ==============================
+   Candidates Table
+============================== */
+
+.candidate-table {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.2fr)
+    minmax(160px, 1.5fr)
+    minmax(90px, 0.7fr)
+    minmax(110px, 0.8fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 600px;
+  padding: 17px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-header {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: #6b7280;
+  background-color: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==============================
+   Buttons and Interactions
+============================== */
+
+.MuiButton-root {
+  border-radius: 8px;
+}
+
+.MuiListItemButton-root {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* ==============================
+   Responsive: Tablets
+============================== */
+
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-content {
+    padding: 22px;
+  }
+
+  .stat-card .MuiCardContent-root {
+    padding: 18px;
+  }
+}
+
+/* ==============================
+   Responsive: Mobile
+============================== */
+
+@media (max-width: 600px) {
+  .page-content {
+    padding: 16px;
+  }
+
+  .topbar {
+    min-height: 60px;
+  }
+
+  .welcome-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card .MuiCardContent-root {
+    padding: 18px;
+  }
+
+  .candidate-card .MuiCardContent-root {
+    padding: 16px;
+  }
+
+  .table-row {
+    gap: 12px;
+  }
+}
