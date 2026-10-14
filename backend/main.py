@@ -1,51 +1,79 @@
 import os
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import google.generativeai as genai
+from pydantic import BaseModel
 import pypdf2
 
-app = FastAPI(title="AI-Powered ATS Backend", version="1.0")
+GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY")
+genai.configure(api_key=GOOGLE_API_KEY)
 
-# CORS middleware add kar rahe hain taaki frontend se requests easily aa sakein
+app = FastAPI(
+    title="AI-Powered ATS Backend",
+    version="1.0",
+    description="Backend API for AI-powered Applicant Tracking System using FastAPI and Gemini"
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Aap baad mein frontend ka specific URL de sakti hain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 @app.get("/")
 def read_root():
-  return {"message": "Welcome to AI-Powered ATS Backend API!"}
-
+    return {"message": "Welcome to AI-Powered ATS Backend API!"}
 
 def extract_text_from_pdf(file: UploadFile) -> str:
-  """Uploaded PDF file se text extract karne ka function"""
-  reader = pypdf2.PdfReader(file.file)
-  text = ""
-  for page in reader.pages:
-    text += page.extract_text() or ""
-  return text
-
+    try:
+        reader = pypdf2.PdfReader(file.file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        return text
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading PDF file: {str(e)}")
 
 @app.post("/api/analyze")
 async def analyze_resume(
-    job_description: str = Form(...), resume: UploadFile = File(...)
+    job_description: str = Form(...),
+    resume: UploadFile = File(...)
 ):
-  # 1. PDF se text extract karo
-  resume_text = extract_text_from_pdf(resume)
+    resume_text = extract_text_from_pdf(resume)
 
-  # Yahan hum baad mein Google Gemini API integrate karenge
-  # Jo resume text aur job description ko compare karke score aur feedback dega.
+    if not resume_text.strip():
+        raise HTTPException(status_code=400, detail="Uploaded PDF resume is empty or unreadable.")
 
-  return {
-      "status": "success",
-      "filename": resume.filename,
-      "extracted_text_preview": resume_text[
-          :300
-      ],  # Sirf shuru ka text check karne ke liye
-      "message": (
-          "Resume uploaded successfully! Gemini API integration pending."
-      ),
-  }
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        prompt = f"""
+        You are an expert ATS (Applicant Tracking System) analyzer. 
+        Compare the following Resume text with the Job Description and provide:
+        1. Match Score (in percentage, e.g., 85%)
+        2. Missing Keywords that should be added to the resume
+        3. Strengths of the candidate based on the resume
+        4. Areas of improvement
+
+        Job Description:
+        {job_description}
+
+        Resume Text:
+        {resume_text}
+
+        Provide the output in a clear, structured JSON-like or readable format.
+        """
+
+        response = model.generate_content(prompt)
+        analysis_result = response.text
+
+        return {
+            "status": "success",
+            "filename": resume.filename,
+            "analysis": analysis_result
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gemini API Error: {str(e)}")
