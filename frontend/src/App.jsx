@@ -29,6 +29,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddIcon from "@mui/icons-material/Add";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import Jobs from "./pages/Jobs";
 
 import "./App.css";
 
