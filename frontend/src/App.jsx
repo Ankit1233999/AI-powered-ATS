@@ -29,8 +29,8 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AddIcon from "@mui/icons-material/Add";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
-import Jobs from "./pages/Jobs";
 
+import Jobs from "./pages/Jobs";
 import "./App.css";
 
 const drawerWidth = 250;
@@ -168,7 +168,6 @@ export default function App() {
               }}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
-
               <ListItemText primary={item.label} />
             </ListItemButton>
           ))}
@@ -340,8 +339,8 @@ export default function App() {
                               candidate.status === "Interview"
                                 ? "success"
                                 : candidate.status === "Shortlisted"
-                                ? "info"
-                                : "default"
+                                  ? "info"
+                                  : "default"
                             }
                           />
                         </Box>
@@ -353,8 +352,13 @@ export default function App() {
             </>
           )}
 
-          {/* Placeholder pages */}
-          {activePage !== "Dashboard" && (
+          {/* Actual Jobs page */}
+          {activePage === "Jobs" && <Jobs />}
+
+          {/* Other placeholder pages */}
+          {["Candidates", "Applications", "Settings"].includes(
+            activePage
+          ) && (
             <Card sx={{ mt: 3, borderRadius: 3 }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h6" fontWeight={700}>
@@ -362,8 +366,7 @@ export default function App() {
                 </Typography>
 
                 <Typography color="text.secondary" mt={1}>
-                  This page is ready for development. We will add
-                  its features in the next steps.
+                  This page is under development.
                 </Typography>
 
                 <Button
