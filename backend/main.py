@@ -74,6 +74,6 @@ async def analyze_resume(
             "filename": resume.filename,
             "analysis": analysis_result
         }
-
+#bbn
     except Exception as  e:
         raise HTTPException(status_code=500, detail=f"Gemini API Error: {str(e)}")
