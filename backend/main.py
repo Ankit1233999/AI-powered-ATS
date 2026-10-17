@@ -77,3 +77,4 @@ async def analyze_resume(
 #bbn
     except Exception as  e:
         raise HTTPException(status_code=500, detail=f"Gemini API Error: {str(e)}")
+# Main application entry point
