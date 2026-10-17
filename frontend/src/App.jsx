@@ -31,6 +31,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 import Jobs from "./pages/Jobs";
+import Candidates from "./pages/Candidates";
 import "./App.css";
 
 const drawerWidth = 250;
@@ -44,53 +45,17 @@ const menuItems = [
 ];
 
 const stats = [
-  {
-    label: "Active Jobs",
-    value: "12",
-    detail: "Currently hiring",
-  },
-  {
-    label: "Total Candidates",
-    value: "248",
-    detail: "Across all jobs",
-  },
-  {
-    label: "Applications",
-    value: "86",
-    detail: "24 awaiting review",
-  },
-  {
-    label: "Interviews",
-    value: "14",
-    detail: "5 scheduled today",
-  },
+  { label: "Active Jobs", value: "12", detail: "Currently hiring" },
+  { label: "Total Candidates", value: "248", detail: "Across all jobs" },
+  { label: "Applications", value: "86", detail: "24 awaiting review" },
+  { label: "Interviews", value: "14", detail: "5 scheduled today" },
 ];
 
 const candidates = [
-  {
-    name: "Rahul Sharma",
-    role: "Frontend Developer",
-    score: 94,
-    status: "Interview",
-  },
-  {
-    name: "Priya Singh",
-    role: "Backend Developer",
-    score: 88,
-    status: "Applied",
-  },
-  {
-    name: "Aman Verma",
-    role: "Full Stack Developer",
-    score: 82,
-    status: "Shortlisted",
-  },
-  {
-    name: "Neha Gupta",
-    role: "UI/UX Designer",
-    score: 76,
-    status: "Applied",
-  },
+  { name: "Rahul Sharma", role: "Frontend Developer", score: 94, status: "Interview" },
+  { name: "Priya Singh", role: "Backend Developer", score: 88, status: "Applied" },
+  { name: "Aman Verma", role: "Full Stack Developer", score: 82, status: "Shortlisted" },
+  { name: "Neha Gupta", role: "UI/UX Designer", score: 76, status: "Applied" },
 ];
 
 export default function App() {
@@ -119,12 +84,10 @@ export default function App() {
           <Box className="brand-icon">
             <SmartToyOutlinedIcon />
           </Box>
-
           <Box>
             <Typography variant="h6" fontWeight={700}>
               HireAI
             </Typography>
-
             <Typography variant="caption" color="#9CA3AF">
               Applicant Tracking System
             </Typography>
@@ -133,9 +96,7 @@ export default function App() {
 
         <Divider sx={{ borderColor: "#293244" }} />
 
-        <Typography className="menu-heading">
-          WORKSPACE
-        </Typography>
+        <Typography className="menu-heading">WORKSPACE</Typography>
 
         <List sx={{ px: 1.5 }}>
           {menuItems.map((item) => (
@@ -147,21 +108,17 @@ export default function App() {
                 borderRadius: 2,
                 mb: 0.5,
                 color: "#D1D5DB",
-
                 "& .MuiListItemIcon-root": {
                   color: "inherit",
                   minWidth: 40,
                 },
-
                 "&.Mui-selected": {
                   backgroundColor: "#4F46E5",
                   color: "#ffffff",
                 },
-
                 "&.Mui-selected:hover": {
                   backgroundColor: "#4338CA",
                 },
-
                 "&:hover": {
                   backgroundColor: "#293244",
                 },
@@ -175,12 +132,10 @@ export default function App() {
 
         <Box className="sidebar-footer">
           <Avatar sx={{ bgcolor: "#4F46E5" }}>A</Avatar>
-
           <Box>
             <Typography fontSize={14} fontWeight={600}>
               Admin User
             </Typography>
-
             <Typography fontSize={12} color="#9CA3AF">
               Recruiter
             </Typography>
@@ -200,10 +155,7 @@ export default function App() {
           }}
         >
           <Toolbar className="topbar">
-            <Typography fontWeight={600}>
-              {activePage}
-            </Typography>
-
+            <Typography fontWeight={600}>{activePage}</Typography>
             <IconButton
               aria-label="Notifications"
               sx={{ color: "#374151" }}
@@ -222,7 +174,6 @@ export default function App() {
                   ? "Recruitment Dashboard"
                   : activePage}
               </Typography>
-
               <Typography color="text.secondary" mt={0.5}>
                 Manage your recruitment process in one place.
               </Typography>
@@ -231,7 +182,11 @@ export default function App() {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => setActivePage("Jobs")}
+              onClick={() =>
+                setActivePage(
+                  activePage === "Candidates" ? "Candidates" : "Jobs"
+                )
+              }
               sx={{
                 backgroundColor: "#4F46E5",
                 textTransform: "none",
@@ -241,36 +196,24 @@ export default function App() {
                 },
               }}
             >
-              Create Job
+              {activePage === "Candidates" ? "Add Candidate" : "Create Job"}
             </Button>
           </Box>
 
-          {/* Dashboard page */}
+          {/* Dashboard */}
           {activePage === "Dashboard" && (
             <>
               <Box className="stats-grid">
                 {stats.map((stat) => (
                   <Card key={stat.label} className="stat-card">
                     <CardContent>
-                      <Typography
-                        color="text.secondary"
-                        fontSize={14}
-                      >
+                      <Typography color="text.secondary" fontSize={14}>
                         {stat.label}
                       </Typography>
-
-                      <Typography
-                        variant="h4"
-                        fontWeight={700}
-                        my={1}
-                      >
+                      <Typography variant="h4" fontWeight={700} my={1}>
                         {stat.value}
                       </Typography>
-
-                      <Typography
-                        fontSize={12}
-                        color="text.secondary"
-                      >
+                      <Typography fontSize={12} color="text.secondary">
                         {stat.detail}
                       </Typography>
                     </CardContent>
@@ -278,7 +221,6 @@ export default function App() {
                 ))}
               </Box>
 
-              {/* Recent candidates */}
               <Card className="candidate-card">
                 <CardContent>
                   <Box className="section-heading">
@@ -286,15 +228,10 @@ export default function App() {
                       <Typography variant="h6" fontWeight={700}>
                         Recent Candidates
                       </Typography>
-
-                      <Typography
-                        color="text.secondary"
-                        fontSize={13}
-                      >
+                      <Typography color="text.secondary" fontSize={13}>
                         Review your latest applicants
                       </Typography>
                     </Box>
-
                     <Button
                       onClick={() => setActivePage("Candidates")}
                       sx={{ textTransform: "none" }}
@@ -312,25 +249,16 @@ export default function App() {
                     </Box>
 
                     {candidates.map((candidate) => (
-                      <Box
-                        className="table-row"
-                        key={candidate.name}
-                      >
+                      <Box className="table-row" key={candidate.name}>
                         <Typography fontWeight={600}>
                           {candidate.name}
                         </Typography>
-
                         <Typography color="text.secondary">
                           {candidate.role}
                         </Typography>
-
-                        <Typography
-                          fontWeight={700}
-                          color="success.main"
-                        >
+                        <Typography fontWeight={700} color="success.main">
                           {candidate.score}%
                         </Typography>
-
                         <Box>
                           <Chip
                             size="small"
@@ -352,23 +280,22 @@ export default function App() {
             </>
           )}
 
-          {/* Actual Jobs page */}
+          {/* Jobs page */}
           {activePage === "Jobs" && <Jobs />}
 
-          {/* Other placeholder pages */}
-          {["Candidates", "Applications", "Settings"].includes(
-            activePage
-          ) && (
+          {/* Candidates page */}
+          {activePage === "Candidates" && <Candidates />}
+
+          {/* Remaining placeholder pages */}
+          {["Applications", "Settings"].includes(activePage) && (
             <Card sx={{ mt: 3, borderRadius: 3 }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h6" fontWeight={700}>
                   {activePage}
                 </Typography>
-
                 <Typography color="text.secondary" mt={1}>
                   This page is under development.
                 </Typography>
-
                 <Button
                   sx={{ mt: 2, textTransform: "none" }}
                   onClick={() => setActivePage("Dashboard")}
