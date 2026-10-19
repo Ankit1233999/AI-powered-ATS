@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  InputAdornment,
   MenuItem,
   Stack,
   TextField,
@@ -22,6 +24,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import WorkIcon from "@mui/icons-material/Work";
 import SearchIcon from "@mui/icons-material/Search";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 
 const initialJobs = [
   {
@@ -48,6 +52,30 @@ const initialJobs = [
     type: "Internship",
     status: "Closed",
   },
+  {
+    id: 4,
+    title: "React Developer",
+    department: "Engineering",
+    location: "Remote",
+    type: "Internship",
+    status: "Open",
+  },
+  {
+    id: 5,
+    title: "UI/UX Designer",
+    department: "Design",
+    location: "Jaipur",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 6,
+    title: "Data Analyst",
+    department: "Analytics",
+    location: "Hybrid",
+    type: "Full-time",
+    status: "Closed",
+  },
 ];
 
 const emptyForm = {
@@ -58,24 +86,52 @@ const emptyForm = {
   status: "Open",
 };
 
+const employmentTypes = [
+  "Full-time",
+  "Part-time",
+  "Internship",
+  "Contract",
+];
+
+const jobStatuses = ["Open", "Closed"];
+
 export default function Jobs() {
   const [jobs, setJobs] = useState(initialJobs);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [openForm, setOpenForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState({ ...emptyForm });
 
-  const filteredJobs = jobs.filter((job) =>
-    `${job.title} ${job.department} ${job.location}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const openJobs = jobs.filter((job) => job.status === "Open").length;
+  const closedJobs = jobs.filter((job) => job.status === "Closed").length;
+
+  const filteredJobs = jobs.filter((job) => {
+    const searchText = [
+      job.title,
+      job.department,
+      job.location,
+      job.type,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    const matchesSearch = searchText.includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === "All" || job.status === statusFilter;
+    const matchesType = typeFilter === "All" || job.type === typeFilter;
+
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   const handleChange = (event) => {
-    setForm({
-      ...form,
-      [event.target.name]: event.target.value,
-    });
+    const { name, value } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
   const handleOpenForm = (job = null) => {
@@ -90,7 +146,7 @@ export default function Jobs() {
       });
     } else {
       setEditingId(null);
-      setForm(emptyForm);
+      setForm({ ...emptyForm });
     }
 
     setOpenForm(true);
@@ -99,33 +155,33 @@ export default function Jobs() {
   const handleCloseForm = () => {
     setOpenForm(false);
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm });
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (
-      !form.title.trim() ||
-      !form.department.trim() ||
-      !form.location.trim()
-    ) {
+    const newJob = {
+      ...form,
+      title: form.title.trim(),
+      department: form.department.trim(),
+      location: form.location.trim(),
+    };
+
+    if (!newJob.title || !newJob.department || !newJob.location) {
       return;
     }
 
     if (editingId !== null) {
       setJobs((previousJobs) =>
         previousJobs.map((job) =>
-          job.id === editingId ? { ...job, ...form } : job
+          job.id === editingId ? { ...job, ...newJob } : job
         )
       );
     } else {
       setJobs((previousJobs) => [
         ...previousJobs,
-        {
-          ...form,
-          id: Date.now(),
-        },
+        { ...newJob, id: Date.now() },
       ]);
     }
 
@@ -137,15 +193,16 @@ export default function Jobs() {
       "Are you sure you want to delete this job?"
     );
 
-    if (confirmed) {
-      setJobs((previousJobs) =>
-        previousJobs.filter((job) => job.id !== id)
-      );
-    }
+    if (!confirmed) return;
+
+    setJobs((previousJobs) =>
+      previousJobs.filter((job) => job.id !== id)
+    );
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, width: "100%" }}>
+    <Box sx={{ p: { xs: 2, md: 3 }, width: "100%", maxWidth: 1600, mx: "auto" }}>
+      {/* Page heading */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
@@ -154,12 +211,20 @@ export default function Jobs() {
         sx={{ mb: 3 }}
       >
         <Box>
-          <Typography variant="h4" fontWeight={700}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: "#172033",
+              letterSpacing: "-0.8px",
+              fontSize: { xs: "1.65rem", sm: "2rem" },
+            }}
+          >
             Job Management
           </Typography>
 
-          <Typography color="text.secondary" sx={{ mt: 1 }}>
-            Create and manage your job openings.
+          <Typography color="text.secondary" sx={{ mt: 0.75 }}>
+            Create, organize, and manage your job openings.
           </Typography>
         </Box>
 
@@ -167,42 +232,191 @@ export default function Jobs() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpenForm()}
+          sx={{
+            alignSelf: { xs: "flex-start", sm: "auto" },
+            px: 2.5,
+            py: 1.2,
+            bgcolor: "#4f46e5",
+            "&:hover": { bgcolor: "#3730a3" },
+          }}
         >
           Add New Job
         </Button>
       </Stack>
 
-      <TextField
-        fullWidth
-        placeholder="Search by job title, department, or location..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        slotProps={{
-          input: {
-            startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
+      {/* Summary cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        {[
+          {
+            title: "Total Jobs",
+            value: jobs.length,
+            icon: <WorkIcon />,
+            color: "#4f46e5",
+            background: "#eef2ff",
           },
+          {
+            title: "Open Positions",
+            value: openJobs,
+            icon: <BusinessCenterOutlinedIcon />,
+            color: "#15803d",
+            background: "#dcfce7",
+          },
+          {
+            title: "Closed Positions",
+            value: closedJobs,
+            icon: <WorkIcon />,
+            color: "#b45309",
+            background: "#fef3c7",
+          },
+        ].map((item) => (
+          <Grid item xs={12} sm={4} key={item.title}>
+            <Card
+              variant="outlined"
+              sx={{
+                height: "100%",
+                borderRadius: "16px",
+                borderColor: "#e5eaf2",
+                boxShadow: "0 2px 8px rgba(15,23,42,0.04)",
+              }}
+            >
+              <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box>
+                    <Typography color="text.secondary" variant="body2">
+                      {item.title}
+                    </Typography>
+
+                    <Typography
+                      variant="h4"
+                      sx={{ mt: 1, fontWeight: 800, color: "#172033" }}
+                    >
+                      {item.value}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 48,
+                      height: 48,
+                      borderRadius: "14px",
+                      bgcolor: item.background,
+                      color: item.color,
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Search and filters */}
+      <Card
+        variant="outlined"
+        sx={{
+          p: { xs: 1.5, sm: 2 },
+          mb: 3,
+          borderRadius: "16px",
+          borderColor: "#e5eaf2",
+          boxShadow: "0 2px 8px rgba(15,23,42,0.03)",
         }}
-        sx={{ mb: 3, maxWidth: 600 }}
-      />
+      >
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+        >
+          <TextField
+            fullWidth
+            placeholder="Search by title, department, or location..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#667085" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
 
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        {filteredJobs.length} job(s) found
-      </Typography>
+          <TextField
+            select
+            label="Job Status"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            sx={{ minWidth: { md: 165 } }}
+          >
+            <MenuItem value="All">All statuses</MenuItem>
+            {jobStatuses.map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
+              </MenuItem>
+            ))}
+          </TextField>
 
-      <Grid container spacing={2}>
+          <TextField
+            select
+            label="Employment Type"
+            value={typeFilter}
+            onChange={(event) => setTypeFilter(event.target.value)}
+            sx={{ minWidth: { md: 190 } }}
+          >
+            <MenuItem value="All">All types</MenuItem>
+            {employmentTypes.map((type) => (
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Stack>
+      </Card>
+
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
+        <Typography fontWeight={700} sx={{ color: "#172033" }}>
+          All Job Openings
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          {filteredJobs.length} of {jobs.length} jobs
+        </Typography>
+      </Stack>
+
+      {/* Job cards */}
+      <Grid container spacing={2.5}>
         {filteredJobs.map((job) => (
           <Grid item xs={12} sm={6} lg={4} key={job.id}>
             <Card
               variant="outlined"
               sx={{
                 height: "100%",
-                borderRadius: 3,
+                borderRadius: "16px",
+                borderColor: "#e5eaf2",
+                bgcolor: "#ffffff",
+                transition: "all 0.2s ease",
                 "&:hover": {
-                  boxShadow: 3,
+                  transform: "translateY(-3px)",
+                  borderColor: "#c7d2fe",
+                  boxShadow: "0 10px 25px rgba(15,23,42,0.07)",
                 },
               }}
             >
-              <CardContent>
+              <CardContent sx={{ p: 2.5 }}>
                 <Stack
                   direction="row"
                   justifyContent="space-between"
@@ -211,10 +425,14 @@ export default function Jobs() {
                 >
                   <Box
                     sx={{
-                      backgroundColor: "#e8eafc",
-                      color: "#3949ab",
-                      p: 1.5,
-                      borderRadius: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 48,
+                      height: 48,
+                      borderRadius: "14px",
+                      bgcolor: "#eef2ff",
+                      color: "#4f46e5",
                     }}
                   >
                     <WorkIcon />
@@ -224,67 +442,157 @@ export default function Jobs() {
                     label={job.status}
                     color={job.status === "Open" ? "success" : "default"}
                     size="small"
+                    sx={{ fontWeight: 700 }}
                   />
                 </Stack>
 
-                <Typography variant="h6" fontWeight={700} sx={{ mt: 2 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mt: 2.5,
+                    fontWeight: 750,
+                    color: "#172033",
+                    overflowWrap: "anywhere",
+                  }}
+                >
                   {job.title}
                 </Typography>
 
-                <Typography color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                  color="text.secondary"
+                  sx={{ mt: 0.75, fontSize: 13 }}
+                >
                   {job.department}
                 </Typography>
 
-                <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-                  Location: {job.location}
-                </Typography>
+                <Stack spacing={1.25} sx={{ mt: 2 }}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <LocationOnOutlinedIcon
+                      sx={{ fontSize: 18, color: "#667085" }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {job.location}
+                    </Typography>
+                  </Stack>
 
-                <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-                  Type: {job.type}
-                </Typography>
-
-                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                  <Button
-                    size="small"
-                    startIcon={<EditIcon />}
-                    onClick={() => handleOpenForm(job)}
-                  >
-                    Edit
-                  </Button>
-
-                  <IconButton
-                    aria-label={`Delete ${job.title}`}
-                    color="error"
-                    onClick={() => handleDelete(job.id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <BusinessCenterOutlinedIcon
+                      sx={{ fontSize: 18, color: "#667085" }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {job.type}
+                    </Typography>
+                  </Stack>
                 </Stack>
+
+                <Box
+                  sx={{
+                    borderTop: "1px solid #e5eaf2",
+                    mt: 2.5,
+                    pt: 2,
+                  }}
+                >
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleOpenForm(job)}
+                      sx={{
+                        flex: 1,
+                        borderColor: "#dce3ee",
+                        color: "#4f46e5",
+                        "&:hover": {
+                          borderColor: "#4f46e5",
+                          bgcolor: "#eef2ff",
+                        },
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                    <IconButton
+                      aria-label={`Delete ${job.title}`}
+                      title="Delete job"
+                      color="error"
+                      onClick={() => handleDelete(job.id)}
+                      sx={{
+                        border: "1px solid #fee2e2",
+                        borderRadius: "8px",
+                        "&:hover": { bgcolor: "#fef2f2" },
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
+      {/* Empty search result */}
       {filteredJobs.length === 0 && (
-        <Typography color="text.secondary" sx={{ mt: 4 }}>
-          No jobs found. Try another search or create a new job.
-        </Typography>
+        <Card
+          variant="outlined"
+          sx={{
+            mt: 2,
+            py: 6,
+            px: 2,
+            textAlign: "center",
+            borderRadius: "16px",
+            borderColor: "#e5eaf2",
+          }}
+        >
+          <WorkIcon sx={{ fontSize: 44, color: "#a5b4fc", mb: 1 }} />
+
+          <Typography variant="h6" fontWeight={700}>
+            No jobs found
+          </Typography>
+
+          <Typography color="text.secondary" sx={{ mt: 1 }}>
+            Try another search or change the filters.
+          </Typography>
+
+          <Button
+            sx={{ mt: 2 }}
+            onClick={() => {
+              setSearch("");
+              setStatusFilter("All");
+              setTypeFilter("All");
+            }}
+          >
+            Clear Filters
+          </Button>
+        </Card>
       )}
 
+      {/* Create and edit job dialog */}
       <Dialog
         open={openForm}
         onClose={handleCloseForm}
         fullWidth
         maxWidth="sm"
+        PaperProps={{
+          sx: { borderRadius: "18px" },
+        }}
       >
         <Box component="form" onSubmit={handleSubmit}>
-          <DialogTitle>
+          <DialogTitle sx={{ fontWeight: 800, pt: 3 }}>
             {editingId !== null ? "Edit Job" : "Create New Job"}
           </DialogTitle>
 
           <DialogContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 2, mt: 0.5 }}
+            >
+              Enter the details for this job opening.
+            </Typography>
+
+            <Stack spacing={2}>
               <TextField
                 label="Job Title"
                 name="title"
@@ -320,10 +628,11 @@ export default function Jobs() {
                 onChange={handleChange}
                 fullWidth
               >
-                <MenuItem value="Full-time">Full-time</MenuItem>
-                <MenuItem value="Part-time">Part-time</MenuItem>
-                <MenuItem value="Internship">Internship</MenuItem>
-                <MenuItem value="Contract">Contract</MenuItem>
+                {employmentTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
               </TextField>
 
               <TextField
@@ -334,16 +643,30 @@ export default function Jobs() {
                 onChange={handleChange}
                 fullWidth
               >
-                <MenuItem value="Open">Open</MenuItem>
-                <MenuItem value="Closed">Closed</MenuItem>
+                {jobStatuses.map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
               </TextField>
             </Stack>
           </DialogContent>
 
-          <DialogActions sx={{ p: 2 }}>
-            <Button onClick={handleCloseForm}>Cancel</Button>
+          <DialogActions sx={{ p: 3, pt: 2 }}>
+            <Button onClick={handleCloseForm} color="inherit">
+              Cancel
+            </Button>
 
-            <Button type="submit" variant="contained">
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={editingId === null ? <AddIcon /> : <EditIcon />}
+              sx={{
+                px: 2.5,
+                bgcolor: "#4f46e5",
+                "&:hover": { bgcolor: "#3730a3" },
+              }}
+            >
               {editingId !== null ? "Save Changes" : "Create Job"}
             </Button>
           </DialogActions>

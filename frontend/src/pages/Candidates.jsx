@@ -23,6 +23,25 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
+import WorkIcon from "@mui/icons-material/Work";
+
+const statusOptions = [
+  "Applied",
+  "Shortlisted",
+  "Interview",
+  "Hired",
+  "Rejected",
+];
+
+const statusColors = {
+  Applied: "default",
+  Shortlisted: "info",
+  Interview: "warning",
+  Hired: "success",
+  Rejected: "error",
+};
 
 const initialCandidates = [
   {
@@ -31,14 +50,14 @@ const initialCandidates = [
     email: "rahul@example.com",
     phone: "9876543210",
     position: "Frontend Developer",
-    status: "Applied",
+    status: "Shortlisted",
   },
   {
     id: 2,
     name: "Priya Singh",
     email: "priya@example.com",
     phone: "9876543211",
-    position: "Backend Developer",
+    position: "UI/UX Designer",
     status: "Interview",
   },
   {
@@ -46,71 +65,71 @@ const initialCandidates = [
     name: "Amit Kumar",
     email: "amit@example.com",
     phone: "9876543212",
-    position: "Full Stack Developer",
-    status: "Shortlisted",
+    position: "Backend Developer",
+    status: "Applied",
   },
   {
     id: 4,
     name: "Sneha Gupta",
     email: "sneha@example.com",
     phone: "9876543213",
-    position: "UI/UX Designer",
-    status: "Applied",
+    position: "Full Stack Developer",
+    status: "Hired",
   },
   {
     id: 5,
     name: "Rohit Verma",
     email: "rohit@example.com",
     phone: "9876543214",
-    position: "Python Developer",
-    status: "Interview",
+    position: "Data Analyst",
+    status: "Applied",
   },
   {
     id: 6,
     name: "Neha Sharma",
     email: "neha@example.com",
     phone: "9876543215",
-    position: "Data Analyst",
-    status: "Hired",
+    position: "Frontend Developer",
+    status: "Interview",
   },
   {
     id: 7,
     name: "Vikas Yadav",
     email: "vikas@example.com",
     phone: "9876543216",
-    position: "Java Developer",
-    status: "Rejected",
+    position: "Backend Developer",
+    status: "Shortlisted",
   },
   {
     id: 8,
     name: "Pooja Meena",
     email: "pooja@example.com",
     phone: "9876543217",
-    position: "React Developer",
-    status: "Shortlisted",
+    position: "UI/UX Designer",
+    status: "Applied",
   },
   {
     id: 9,
     name: "Arjun Singh",
     email: "arjun@example.com",
     phone: "9876543218",
-    position: "DevOps Engineer",
-    status: "Applied",
+    position: "Full Stack Developer",
+    status: "Rejected",
   },
   {
     id: 10,
     name: "Anjali Jain",
     email: "anjali@example.com",
     phone: "9876543219",
-    position: "Software Engineer",
-    status: "Interview",
+    position: "Data Analyst",
+    status: "Shortlisted",
   },
   {
     id: 11,
     name: "Karan Patel",
     email: "karan@example.com",
     phone: "9876543220",
-    position: "Node.js Developer",
+    position: "Frontend Developer",
     status: "Applied",
   },
   {
@@ -118,23 +137,23 @@ const initialCandidates = [
     name: "Simran Kaur",
     email: "simran@example.com",
     phone: "9876543221",
-    position: "HR Executive",
-    status: "Hired",
+    position: "UI/UX Designer",
+    status: "Interview",
   },
   {
     id: 13,
     name: "Deepak Saini",
     email: "deepak@example.com",
     phone: "9876543222",
-    position: "MERN Stack Developer",
-    status: "Shortlisted",
+    position: "Backend Developer",
+    status: "Hired",
   },
   {
     id: 14,
     name: "Riya Agarwal",
     email: "riya@example.com",
     phone: "9876543223",
-    position: "QA Tester",
+    position: "Full Stack Developer",
     status: "Applied",
   },
   {
@@ -142,7 +161,7 @@ const initialCandidates = [
     name: "Mohit Choudhary",
     email: "mohit@example.com",
     phone: "9876543224",
-    position: "Machine Learning Engineer",
+    position: "Data Analyst",
     status: "Rejected",
   },
 ];
@@ -155,23 +174,15 @@ const emptyForm = {
   status: "Applied",
 };
 
-const statusColors = {
-  Applied: "default",
-  Shortlisted: "info",
-  Interview: "warning",
-  Hired: "success",
-  Rejected: "error",
+const pageSx = {
+  width: "100%",
+  minHeight: "100%",
+  p: { xs: 2, md: 3 },
+  backgroundColor: "#f6f7fb",
+  boxSizing: "border-box",
 };
 
-const statusOptions = [
-  "Applied",
-  "Shortlisted",
-  "Interview",
-  "Hired",
-  "Rejected",
-];
-
-export default function Candidates() {
+const Candidates = () => {
   const [candidates, setCandidates] = useState(initialCandidates);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -179,46 +190,46 @@ export default function Candidates() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
-  const filteredCandidates = candidates.filter((candidate) => {
-    const searchText = [
-      candidate.name,
-      candidate.email,
-      candidate.phone,
-      candidate.position,
-    ]
-      .join(" ")
-      .toLowerCase();
+  const totalCandidates = candidates.length;
+  const interviewCount = candidates.filter(
+    (candidate) => candidate.status === "Interview"
+  ).length;
+  const shortlistedCount = candidates.filter(
+    (candidate) => candidate.status === "Shortlisted"
+  ).length;
+  const hiredCount = candidates.filter(
+    (candidate) => candidate.status === "Hired"
+  ).length;
 
-    const matchesSearch = searchText.includes(search.toLowerCase());
+  const filteredCandidates = candidates.filter((candidate) => {
+    const searchText = search.toLowerCase();
+
+    const matchesSearch =
+      candidate.name.toLowerCase().includes(searchText) ||
+      candidate.email.toLowerCase().includes(searchText) ||
+      candidate.position.toLowerCase().includes(searchText);
+
     const matchesStatus =
       statusFilter === "All" || candidate.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
 
-  const hiredCount = candidates.filter(
-    (candidate) => candidate.status === "Hired"
-  ).length;
+  const handleOpenAdd = () => {
+    setEditingId(null);
+    setForm({ ...emptyForm });
+    setOpen(true);
+  };
 
-  const interviewCount = candidates.filter(
-    (candidate) => candidate.status === "Interview"
-  ).length;
-
-  const handleOpen = (candidate = null) => {
-    if (candidate) {
-      setEditingId(candidate.id);
-      setForm({
-        name: candidate.name,
-        email: candidate.email,
-        phone: candidate.phone,
-        position: candidate.position,
-        status: candidate.status,
-      });
-    } else {
-      setEditingId(null);
-      setForm({ ...emptyForm });
-    }
-
+  const handleOpenEdit = (candidate) => {
+    setEditingId(candidate.id);
+    setForm({
+      name: candidate.name,
+      email: candidate.email,
+      phone: candidate.phone,
+      position: candidate.position,
+      status: candidate.status,
+    });
     setOpen(true);
   };
 
@@ -230,28 +241,16 @@ export default function Candidates() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+    setForm((previous) => ({ ...previous, [name]: value }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const newCandidate = {
-      ...form,
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      position: form.position.trim(),
-    };
-
     if (
-      !newCandidate.name ||
-      !newCandidate.email ||
-      !newCandidate.position
+      !form.name.trim() ||
+      !form.email.trim() ||
+      !form.position.trim()
     ) {
       return;
     }
@@ -260,14 +259,17 @@ export default function Candidates() {
       setCandidates((previous) =>
         previous.map((candidate) =>
           candidate.id === editingId
-            ? { ...candidate, ...newCandidate }
+            ? { ...candidate, ...form }
             : candidate
         )
       );
     } else {
       setCandidates((previous) => [
+        {
+          id: Date.now(),
+          ...form,
+        },
         ...previous,
-        { ...newCandidate, id: Date.now() },
       ]);
     }
 
@@ -279,16 +281,15 @@ export default function Candidates() {
       "Are you sure you want to delete this candidate?"
     );
 
-    if (!confirmed) return;
-
-    setCandidates((previous) =>
-      previous.filter((candidate) => candidate.id !== id)
-    );
+    if (confirmed) {
+      setCandidates((previous) =>
+        previous.filter((candidate) => candidate.id !== id)
+      );
+    }
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
-      {/* Page heading */}
+    <Box sx={pageSx}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         justifyContent="space-between"
@@ -297,211 +298,320 @@ export default function Candidates() {
         sx={{ mb: 3 }}
       >
         <Box>
-          <Typography variant="h5" fontWeight={700}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 800, color: "#202544", mb: 0.5 }}
+          >
             Candidates
           </Typography>
-
-          <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage and track your applicants.
+          <Typography sx={{ color: "#777f96" }}>
+            Manage candidates and track their recruitment progress.
           </Typography>
         </Box>
 
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => handleOpen()}
+          onClick={handleOpenAdd}
+          sx={{
+            alignSelf: { xs: "flex-start", sm: "center" },
+            backgroundColor: "#4f46e5",
+            borderRadius: 2,
+            px: 2.5,
+            py: 1.2,
+            textTransform: "none",
+            fontWeight: 700,
+            "&:hover": { backgroundColor: "#4338ca" },
+          }}
         >
           Add Candidate
         </Button>
       </Stack>
 
-      {/* Summary cards */}
       <Box
         sx={{
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
-            sm: "repeat(3, 1fr)",
+            sm: "repeat(2, minmax(0, 1fr))",
+            lg: "repeat(4, minmax(0, 1fr))",
           },
           gap: 2,
           mb: 3,
         }}
       >
-        <Card variant="outlined">
-          <CardContent>
-            <Typography color="text.secondary" variant="body2">
-              Total Candidates
-            </Typography>
-            <Typography variant="h4" fontWeight={700} sx={{ mt: 1 }}>
-              {candidates.length}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card variant="outlined">
-          <CardContent>
-            <Typography color="text.secondary" variant="body2">
-              Interviews
-            </Typography>
-            <Typography variant="h4" fontWeight={700} sx={{ mt: 1 }}>
-              {interviewCount}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card variant="outlined">
-          <CardContent>
-            <Typography color="text.secondary" variant="body2">
-              Hired
-            </Typography>
-            <Typography variant="h4" fontWeight={700} sx={{ mt: 1 }}>
-              {hiredCount}
-            </Typography>
-          </CardContent>
-        </Card>
+        {[
+          {
+            title: "Total Candidates",
+            value: totalCandidates,
+            color: "#4f46e5",
+          },
+          {
+            title: "Interviews",
+            value: interviewCount,
+            color: "#d97706",
+          },
+          {
+            title: "Shortlisted",
+            value: shortlistedCount,
+            color: "#0284c7",
+          },
+          {
+            title: "Hired",
+            value: hiredCount,
+            color: "#059669",
+          },
+        ].map((item) => (
+          <Card
+            key={item.title}
+            elevation={0}
+            sx={{
+              border: "1px solid #e8eaf2",
+              borderRadius: 3,
+              backgroundColor: "#fff",
+            }}
+          >
+            <CardContent sx={{ p: 2.5, "&:last-child": { pb: 2.5 } }}>
+              <Typography sx={{ color: "#777f96", fontSize: 14, mb: 1 }}>
+                {item.title}
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 800, color: item.color }}
+              >
+                {item.value}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
 
-      {/* Search and status filter */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={2}
-        sx={{ mb: 2 }}
+      <Card
+        elevation={0}
+        sx={{
+          border: "1px solid #e8eaf2",
+          borderRadius: 3,
+          mb: 3,
+        }}
       >
-        <TextField
-          fullWidth
-          placeholder="Search by name, email, phone, or position..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            },
+        <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+          >
+            <TextField
+              fullWidth
+              placeholder="Search by name, email, or position..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: "#8b91a7" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              select
+              size="small"
+              label="Filter by status"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              sx={{ minWidth: { xs: "100%", md: 200 } }}
+            >
+              <MenuItem value="All">All statuses</MenuItem>
+              {statusOptions.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {filteredCandidates.length === 0 ? (
+        <Card
+          elevation={0}
+          sx={{
+            textAlign: "center",
+            py: 7,
+            border: "1px solid #e8eaf2",
+            borderRadius: 3,
           }}
-        />
-
-        <TextField
-          select
-          label="Filter by status"
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value)}
-          sx={{ minWidth: { sm: 200 } }}
         >
-          <MenuItem value="All">All statuses</MenuItem>
-          {statusOptions.map((status) => (
-            <MenuItem key={status} value={status}>
-              {status}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Stack>
-
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Showing {filteredCandidates.length} of {candidates.length} candidates
-      </Typography>
-
-      {/* Candidate list */}
-      <Stack spacing={2}>
-        {filteredCandidates.map((candidate) => (
-          <Card key={candidate.id} variant="outlined">
-            <CardContent>
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-                alignItems={{ xs: "stretch", sm: "center" }}
-                spacing={2}
-              >
-                <Stack direction="row" spacing={2} alignItems="flex-start">
+          <PersonSearchIcon sx={{ fontSize: 52, color: "#a5abc0", mb: 1 }} />
+          <Typography variant="h6" sx={{ color: "#202544", fontWeight: 700 }}>
+            No candidates found
+          </Typography>
+          <Typography sx={{ color: "#777f96", mt: 1 }}>
+            Try another search or add a new candidate.
+          </Typography>
+        </Card>
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, minmax(0, 1fr))",
+              xl: "repeat(3, minmax(0, 1fr))",
+            },
+            gap: 2,
+          }}
+        >
+          {filteredCandidates.map((candidate) => (
+            <Card
+              key={candidate.id}
+              elevation={0}
+              sx={{
+                border: "1px solid #e8eaf2",
+                borderRadius: 3,
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  borderColor: "#c7d2fe",
+                  boxShadow: "0 8px 24px rgba(31, 41, 85, 0.07)",
+                  transform: "translateY(-2px)",
+                },
+              }}
+            >
+              <CardContent sx={{ p: 2.5 }}>
+                <Stack
+                  direction="row"
+                  alignItems="flex-start"
+                  spacing={1.5}
+                >
                   <Box
                     sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 2,
-                      bgcolor: "action.hover",
+                      width: 48,
+                      height: 48,
+                      flexShrink: 0,
+                      borderRadius: 2.5,
+                      backgroundColor: "#eef2ff",
+                      color: "#4f46e5",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      flexShrink: 0,
+                      fontSize: 19,
+                      fontWeight: 800,
                     }}
                   >
-                    <PersonSearchIcon color="action" />
+                    {candidate.name
+                      .split(" ")
+                      .map((part) => part[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
                   </Box>
 
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography variant="h6" fontWeight={700}>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography
+                      sx={{
+                        color: "#202544",
+                        fontWeight: 800,
+                        fontSize: 17,
+                        overflowWrap: "anywhere",
+                      }}
+                    >
                       {candidate.name}
                     </Typography>
+                    <Typography
+                      sx={{
+                        color: "#777f96",
+                        fontSize: 13,
+                        mt: 0.5,
+                      }}
+                    >
+                      Candidate ID: #{candidate.id}
+                    </Typography>
+                  </Box>
 
-                    <Typography color="text.secondary" variant="body2">
+                  <Chip
+                    size="small"
+                    label={candidate.status}
+                    color={statusColors[candidate.status] || "default"}
+                    sx={{ fontWeight: 700 }}
+                  />
+                </Stack>
+
+                <Stack spacing={1.5} sx={{ mt: 3 }}>
+                  <Stack direction="row" spacing={1.2} alignItems="center">
+                    <WorkOutlineIcon
+                      sx={{ fontSize: 19, color: "#858ca3" }}
+                    />
+                    <Typography sx={{ color: "#454d66", fontSize: 14 }}>
+                      {candidate.position}
+                    </Typography>
+                  </Stack>
+
+                  <Stack direction="row" spacing={1.2} alignItems="center">
+                    <EmailIcon sx={{ fontSize: 19, color: "#858ca3" }} />
+                    <Typography
+                      sx={{
+                        color: "#454d66",
+                        fontSize: 14,
+                        overflowWrap: "anywhere",
+                      }}
+                    >
                       {candidate.email}
                     </Typography>
+                  </Stack>
 
-                    <Typography color="text.secondary" variant="body2">
-                      {candidate.phone || "Phone not provided"}
-                    </Typography>
-
-                    <Typography sx={{ mt: 1 }}>
-                      Position: {candidate.position}
-                    </Typography>
-
-                    <Chip
-                      sx={{ mt: 1 }}
-                      label={candidate.status}
-                      color={statusColors[candidate.status] || "default"}
-                      size="small"
+                  <Stack direction="row" spacing={1.2} alignItems="center">
+                    <PhoneOutlinedIcon
+                      sx={{ fontSize: 19, color: "#858ca3" }}
                     />
-                  </Box>
+                    <Typography sx={{ color: "#454d66", fontSize: 14 }}>
+                      {candidate.phone || "Not provided"}
+                    </Typography>
+                  </Stack>
                 </Stack>
 
                 <Stack
                   direction="row"
-                  spacing={1}
-                  alignItems="center"
                   justifyContent="flex-end"
+                  spacing={1}
+                  sx={{
+                    mt: 3,
+                    pt: 1.5,
+                    borderTop: "1px solid #eef0f6",
+                  }}
                 >
-                  <IconButton
-                    aria-label={`Edit ${candidate.name}`}
-                    title="Edit candidate"
-                    onClick={() => handleOpen(candidate)}
+                  <Button
+                    size="small"
+                    startIcon={<EditIcon />}
+                    onClick={() => handleOpenEdit(candidate)}
+                    sx={{
+                      color: "#4f46e5",
+                      textTransform: "none",
+                      fontWeight: 700,
+                    }}
                   >
-                    <EditIcon />
-                  </IconButton>
+                    Edit
+                  </Button>
 
-                  <IconButton
-                    aria-label={`Delete ${candidate.name}`}
-                    title="Delete candidate"
-                    color="error"
+                  <Button
+                    size="small"
+                    startIcon={<DeleteIcon />}
                     onClick={() => handleDelete(candidate.id)}
+                    sx={{
+                      color: "#dc2626",
+                      textTransform: "none",
+                      fontWeight: 700,
+                    }}
                   >
-                    <DeleteIcon />
-                  </IconButton>
+                    Delete
+                  </Button>
                 </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      )}
 
-        {filteredCandidates.length === 0 && (
-          <Card variant="outlined">
-            <CardContent sx={{ py: 5, textAlign: "center" }}>
-              <PersonSearchIcon
-                sx={{ fontSize: 44, color: "text.secondary", mb: 1 }}
-              />
-
-              <Typography variant="h6">No candidates found</Typography>
-
-              <Typography color="text.secondary" sx={{ mt: 1 }}>
-                Try another search or change the status filter.
-              </Typography>
-            </CardContent>
-          </Card>
-        )}
-      </Stack>
-
-      {/* Add and edit dialog */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -509,55 +619,55 @@ export default function Candidates() {
         maxWidth="sm"
       >
         <Box component="form" onSubmit={handleSubmit}>
-          <DialogTitle>
-            {editingId !== null ? "Edit Candidate" : "Add Candidate"}
+          <DialogTitle sx={{ fontWeight: 800, color: "#202544" }}>
+            {editingId !== null ? "Edit Candidate" : "Add New Candidate"}
           </DialogTitle>
 
           <DialogContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
+            <Stack spacing={2.2} sx={{ pt: 1 }}>
               <TextField
-                name="name"
                 label="Full Name"
-                required
-                fullWidth
+                name="name"
                 value={form.name}
                 onChange={handleChange}
+                fullWidth
+                required
               />
 
               <TextField
+                label="Email Address"
                 name="email"
-                label="Email"
                 type="email"
-                required
-                fullWidth
                 value={form.email}
                 onChange={handleChange}
+                fullWidth
+                required
               />
 
               <TextField
+                label="Phone Number"
                 name="phone"
-                label="Phone"
-                fullWidth
                 value={form.phone}
                 onChange={handleChange}
+                fullWidth
               />
 
               <TextField
+                label="Position Applied For"
                 name="position"
-                label="Applied Position"
-                required
-                fullWidth
                 value={form.position}
                 onChange={handleChange}
+                fullWidth
+                required
               />
 
               <TextField
-                name="status"
                 select
-                label="Status"
-                fullWidth
+                label="Application Status"
+                name="status"
                 value={form.status}
                 onChange={handleChange}
+                fullWidth
               >
                 {statusOptions.map((status) => (
                   <MenuItem key={status} value={status}>
@@ -568,10 +678,20 @@ export default function Candidates() {
             </Stack>
           </DialogContent>
 
-          <DialogActions sx={{ p: 2 }}>
-            <Button onClick={handleClose}>Cancel</Button>
-
-            <Button type="submit" variant="contained">
+          <DialogActions sx={{ px: 3, pb: 2.5 }}>
+            <Button onClick={handleClose} sx={{ textTransform: "none" }}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#4f46e5",
+                textTransform: "none",
+                fontWeight: 700,
+                "&:hover": { backgroundColor: "#4338ca" },
+              }}
+            >
               {editingId !== null ? "Save Changes" : "Add Candidate"}
             </Button>
           </DialogActions>
@@ -579,4 +699,6 @@ export default function Candidates() {
       </Dialog>
     </Box>
   );
-}
+};
+
+export default Candidates;
