@@ -10,8 +10,6 @@ env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 api_key = os.getenv("GEMINI_API_KEY")
-print("Loaded API Key:", api_key)  # Yeh terminal mein check karne ke liye hai
-
 if api_key:
     genai.configure(api_key=api_key)
 
@@ -21,11 +19,21 @@ app = FastAPI(title="AI-powered ATS Backend")
 def read_root():
     return {"message": "AI-powered ATS Backend is running successfully!"}
 
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "api_key_configured": api_key is not None
+    }
+
 @app.post("/analyze-resume")
 async def analyze_resume(
     job_description: str = Form(...),
     file: UploadFile = File(...)
 ):
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured.")
+
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
     
