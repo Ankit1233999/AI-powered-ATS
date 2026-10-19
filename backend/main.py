@@ -2,6 +2,7 @@ import os
 import io
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from pydantic import BaseModel
 from dotenv import load_dotenv
 import google.generativeai as genai
 from pypdf import PdfReader
@@ -15,6 +16,10 @@ if api_key:
 
 app = FastAPI(title="AI-powered ATS Backend")
 
+class ATSResponse(BaseModel):
+    status: str
+    analysis: str
+
 @app.get("/")
 def read_root():
     return {"message": "AI-powered ATS Backend is running successfully!"}
@@ -26,7 +31,7 @@ def health_check():
         "api_key_configured": api_key is not None
     }
 
-@app.post("/analyze-resume")
+@app.post("/analyze-resume", response_model=ATSResponse)
 async def analyze_resume(
     job_description: str = Form(...),
     file: UploadFile = File(...)
@@ -64,7 +69,10 @@ async def analyze_resume(
         """
         
         response = model.generate_content(prompt)
-        return {"analysis": response.text}
+        return {
+            "status": "success",
+            "analysis": response.text
+        }
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
