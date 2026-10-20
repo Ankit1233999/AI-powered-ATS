@@ -32,6 +32,7 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 import Jobs from "./pages/Jobs";
 import Candidates from "./pages/Candidates";
+import Applications from "./pages/Applications";
 import "./App.css";
 
 const drawerWidth = 250;
@@ -52,10 +53,30 @@ const stats = [
 ];
 
 const candidates = [
-  { name: "Rahul Sharma", role: "Frontend Developer", score: 94, status: "Interview" },
-  { name: "Priya Singh", role: "Backend Developer", score: 88, status: "Applied" },
-  { name: "Aman Verma", role: "Full Stack Developer", score: 82, status: "Shortlisted" },
-  { name: "Neha Gupta", role: "UI/UX Designer", score: 76, status: "Applied" },
+  {
+    name: "Rahul Sharma",
+    role: "Frontend Developer",
+    score: 94,
+    status: "Interview",
+  },
+  {
+    name: "Priya Singh",
+    role: "Backend Developer",
+    score: 88,
+    status: "Applied",
+  },
+  {
+    name: "Aman Verma",
+    role: "Full Stack Developer",
+    score: 82,
+    status: "Shortlisted",
+  },
+  {
+    name: "Neha Gupta",
+    role: "UI/UX Designer",
+    score: 76,
+    status: "Applied",
+  },
 ];
 
 export default function App() {
@@ -84,6 +105,7 @@ export default function App() {
           <Box className="brand-icon">
             <SmartToyOutlinedIcon />
           </Box>
+
           <Box>
             <Typography variant="h6" fontWeight={700}>
               HireAI
@@ -132,6 +154,7 @@ export default function App() {
 
         <Box className="sidebar-footer">
           <Avatar sx={{ bgcolor: "#4F46E5" }}>A</Avatar>
+
           <Box>
             <Typography fontSize={14} fontWeight={600}>
               Admin User
@@ -156,6 +179,7 @@ export default function App() {
         >
           <Toolbar className="topbar">
             <Typography fontWeight={600}>{activePage}</Typography>
+
             <IconButton
               aria-label="Notifications"
               sx={{ color: "#374151" }}
@@ -174,6 +198,7 @@ export default function App() {
                   ? "Recruitment Dashboard"
                   : activePage}
               </Typography>
+
               <Typography color="text.secondary" mt={0.5}>
                 Manage your recruitment process in one place.
               </Typography>
@@ -210,9 +235,11 @@ export default function App() {
                       <Typography color="text.secondary" fontSize={14}>
                         {stat.label}
                       </Typography>
+
                       <Typography variant="h4" fontWeight={700} my={1}>
                         {stat.value}
                       </Typography>
+
                       <Typography fontSize={12} color="text.secondary">
                         {stat.detail}
                       </Typography>
@@ -228,10 +255,12 @@ export default function App() {
                       <Typography variant="h6" fontWeight={700}>
                         Recent Candidates
                       </Typography>
+
                       <Typography color="text.secondary" fontSize={13}>
                         Review your latest applicants
                       </Typography>
                     </Box>
+
                     <Button
                       onClick={() => setActivePage("Candidates")}
                       sx={{ textTransform: "none" }}
@@ -253,12 +282,15 @@ export default function App() {
                         <Typography fontWeight={600}>
                           {candidate.name}
                         </Typography>
+
                         <Typography color="text.secondary">
                           {candidate.role}
                         </Typography>
+
                         <Typography fontWeight={700} color="success.main">
                           {candidate.score}%
                         </Typography>
+
                         <Box>
                           <Chip
                             size="small"
@@ -286,16 +318,21 @@ export default function App() {
           {/* Candidates page */}
           {activePage === "Candidates" && <Candidates />}
 
-          {/* Remaining placeholder pages */}
-          {["Applications", "Settings"].includes(activePage) && (
+          {/* Applications page */}
+          {activePage === "Applications" && <Applications />}
+
+          {/* Settings placeholder */}
+          {activePage === "Settings" && (
             <Card sx={{ mt: 3, borderRadius: 3 }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h6" fontWeight={700}>
-                  {activePage}
+                  Settings
                 </Typography>
+
                 <Typography color="text.secondary" mt={1}>
                   This page is under development.
                 </Typography>
+
                 <Button
                   sx={{ mt: 2, textTransform: "none" }}
                   onClick={() => setActivePage("Dashboard")}
