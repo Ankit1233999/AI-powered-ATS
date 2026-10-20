@@ -1,11 +1,16 @@
 import os
 import io
+import logging
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import google.generativeai as genai
 from pypdf import PdfReader
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("ats_backend")
 
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
@@ -19,6 +24,13 @@ app = FastAPI(title="AI-powered ATS Backend")
 class ATSResponse(BaseModel):
     status: str
     analysis: str
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
 
 @app.get("/")
 def read_root():
@@ -75,4 +87,5 @@ async def analyze_resume(
         }
     
     except Exception as e:
+        logger.error(f"Error during resume analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
