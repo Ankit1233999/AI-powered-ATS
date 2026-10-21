@@ -10,7 +10,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   InputAdornment,
   MenuItem,
   Stack,
@@ -539,7 +538,7 @@ const Candidates = () => {
 
                 <Stack spacing={1.5} sx={{ mt: 3 }}>
                   <Stack direction="row" spacing={1.2} alignItems="center">
-                    <WorkOutlineIcon
+                    <WorkIcon
                       sx={{ fontSize: 19, color: "#858ca3" }}
                     />
                     <Typography sx={{ color: "#454d66", fontSize: 14 }}>
