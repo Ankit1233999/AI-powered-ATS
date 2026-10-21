@@ -32,7 +32,7 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 import Jobs from "./pages/Jobs";
 import Candidates from "./pages/Candidates";
-import Applications from "./pages/Applications";
+import Applications from "./pages/Application";
 import "./App.css";
 
 const drawerWidth = 250;
