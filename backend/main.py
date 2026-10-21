@@ -3,6 +3,7 @@ import io
 import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -20,6 +21,15 @@ if api_key:
     genai.configure(api_key=api_key)
 
 app = FastAPI(title="AI-powered ATS Backend")
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class ATSResponse(BaseModel):
     status: str
