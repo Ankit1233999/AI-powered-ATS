@@ -66,6 +66,11 @@ async def analyze_resume(
     
     try:
         contents = await file.read()
+        
+        # Limit file size to 5MB
+        if len(contents) > 5 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File size exceeds the 5MB limit.")
+
         pdf_file = io.BytesIO(contents)
         
         reader = PdfReader(pdf_file)
@@ -96,6 +101,8 @@ async def analyze_resume(
             "analysis": response.text
         }
     
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Error during resume analysis: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
