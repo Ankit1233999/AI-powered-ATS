@@ -27,6 +27,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 
+
 const initialJobs = [
   {
     id: 1,
@@ -76,7 +77,120 @@ const initialJobs = [
     type: "Full-time",
     status: "Closed",
   },
+  {
+    id: 7,
+    title: "Full Stack Developer",
+    department: "Engineering",
+    location: "Remote",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 8,
+    title: "Python Developer",
+    department: "Engineering",
+    location: "Jaipur",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 9,
+    title: "Java Developer",
+    department: "Engineering",
+    location: "Hybrid",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 10,
+    title: "Software Tester",
+    department: "Quality Assurance",
+    location: "Jaipur",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 11,
+    title: "DevOps Engineer",
+    department: "Cloud & DevOps",
+    location: "Remote",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 12,
+    title: "Machine Learning Engineer",
+    department: "Artificial Intelligence",
+    location: "Hybrid",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 13,
+    title: "AI Engineer Intern",
+    department: "Artificial Intelligence",
+    location: "Jaipur",
+    type: "Internship",
+    status: "Open",
+  },
+  {
+    id: 14,
+    title: "Cybersecurity Analyst",
+    department: "Security",
+    location: "Remote",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 15,
+    title: "Product Manager",
+    department: "Product",
+    location: "Hybrid",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 16,
+    title: "Business Analyst",
+    department: "Business",
+    location: "Jaipur",
+    type: "Full-time",
+    status: "Open",
+  },
+  {
+    id: 17,
+    title: "Graphic Designer",
+    department: "Design",
+    location: "Remote",
+    type: "Part-time",
+    status: "Open",
+  },
+  {
+    id: 18,
+    title: "Digital Marketing Intern",
+    department: "Marketing",
+    location: "Jaipur",
+    type: "Internship",
+    status: "Open",
+  },
+  {
+    id: 19,
+    title: "Database Administrator",
+    department: "Database",
+    location: "Hybrid",
+    type: "Full-time",
+    status: "Closed",
+  },
+  {
+    id: 20,
+    title: "Technical Support Engineer",
+    department: "IT Support",
+    location: "Jaipur",
+    type: "Contract",
+    status: "Open",
+  },
 ];
+
 
 const emptyForm = {
   title: "",
