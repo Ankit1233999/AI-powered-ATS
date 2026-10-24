@@ -50,6 +50,7 @@ def read_root():
 def health_check():
     return {
         "status": "healthy",
+        "version": "1.0.0",
         "api_key_configured": api_key is not None
     }
 
