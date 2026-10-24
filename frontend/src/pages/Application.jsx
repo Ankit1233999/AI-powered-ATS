@@ -11,34 +11,26 @@ import {
 } from "@mui/material";
 
 const initialApplications = [
-  {
-    id: 1,
-    candidate: "Rahul Sharma",
-    position: "Frontend Developer",
-    date: "2026-10-10",
-    status: "Under Review",
-  },
-  {
-    id: 2,
-    candidate: "Priya Singh",
-    position: "UI/UX Designer",
-    date: "2026-10-12",
-    status: "Interview",
-  },
-  {
-    id: 3,
-    candidate: "Amit Kumar",
-    position: "Backend Developer",
-    date: "2026-10-14",
-    status: "Applied",
-  },
-  {
-    id: 4,
-    candidate: "Sneha Gupta",
-    position: "Full Stack Developer",
-    date: "2026-10-15",
-    status: "Hired",
-  },
+  { id: 1, candidate: "Rahul Sharma", position: "Frontend Developer", date: "2026-10-10", status: "Under Review" },
+  { id: 2, candidate: "Priya Singh", position: "UI/UX Designer", date: "2026-10-12", status: "Interview" },
+  { id: 3, candidate: "Amit Kumar", position: "Backend Developer", date: "2026-10-14", status: "Applied" },
+  { id: 4, candidate: "Sneha Gupta", position: "Full Stack Developer", date: "2026-10-15", status: "Hired" },
+  { id: 5, candidate: "Rohit Verma", position: "Data Analyst", date: "2026-10-16", status: "Applied" },
+  { id: 6, candidate: "Neha Sharma", position: "Frontend Developer", date: "2026-10-16", status: "Interview" },
+  { id: 7, candidate: "Vikas Yadav", position: "Backend Developer", date: "2026-10-17", status: "Shortlisted" },
+  { id: 8, candidate: "Pooja Meena", position: "UI/UX Designer", date: "2026-10-17", status: "Under Review" },
+  { id: 9, candidate: "Arjun Singh", position: "Full Stack Developer", date: "2026-10-18", status: "Rejected" },
+  { id: 10, candidate: "Anjali Jain", position: "Data Analyst", date: "2026-10-18", status: "Shortlisted" },
+  { id: 11, candidate: "Karan Patel", position: "Python Developer", date: "2026-10-19", status: "Applied" },
+  { id: 12, candidate: "Simran Kaur", position: "Java Developer", date: "2026-10-19", status: "Interview" },
+  { id: 13, candidate: "Deepak Saini", position: "Cloud Engineer", date: "2026-10-20", status: "Hired" },
+  { id: 14, candidate: "Riya Agarwal", position: "Software Engineer", date: "2026-10-20", status: "Under Review" },
+  { id: 15, candidate: "Mohit Choudhary", position: "Data Scientist", date: "2026-10-20", status: "Rejected" },
+  { id: 16, candidate: "Kavita Sharma", position: "QA Engineer", date: "2026-10-21", status: "Applied" },
+  { id: 17, candidate: "Aakash Verma", position: "DevOps Engineer", date: "2026-10-21", status: "Shortlisted" },
+  { id: 18, candidate: "Meera Joshi", position: "Machine Learning Engineer", date: "2026-10-22", status: "Interview" },
+  { id: 19, candidate: "Rajat Mehta", position: "Product Designer", date: "2026-10-22", status: "Under Review" },
+  { id: 20, candidate: "Isha Kapoor", position: "Mobile App Developer", date: "2026-10-23", status: "Applied" },
 ];
 
 const statusColors = {
