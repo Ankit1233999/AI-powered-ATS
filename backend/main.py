@@ -54,6 +54,13 @@ def health_check():
         "api_key_configured": api_key is not None
     }
 
+@app.get("/formats")
+def get_supported_formats():
+    return {
+        "supported_formats": ["pdf"],
+        "max_file_size_mb": 5
+    }
+
 @app.post("/analyze-resume", response_model=ATSResponse)
 async def analyze_resume(
     job_description: str = Form(...),
