@@ -1,187 +1,26 @@
+import { useMemo, useRef, useState } from "react";
+import { Alert, Box, Button, Card, CardContent, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
-import { useState } from "react";
-import {
-  Box,
-  Card,
-  Chip,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-
-const initialApplications = [
-  { id: 1, candidate: "Rahul Sharma", position: "Frontend Developer", date: "2026-10-10", status: "Under Review" },
-  { id: 2, candidate: "Priya Singh", position: "UI/UX Designer", date: "2026-10-12", status: "Interview" },
-  { id: 3, candidate: "Amit Kumar", position: "Backend Developer", date: "2026-10-14", status: "Applied" },
-  { id: 4, candidate: "Sneha Gupta", position: "Full Stack Developer", date: "2026-10-15", status: "Hired" },
-  { id: 5, candidate: "Rohit Verma", position: "Data Analyst", date: "2026-10-16", status: "Applied" },
-  { id: 6, candidate: "Neha Sharma", position: "Frontend Developer", date: "2026-10-16", status: "Interview" },
-  { id: 7, candidate: "Vikas Yadav", position: "Backend Developer", date: "2026-10-17", status: "Shortlisted" },
-  { id: 8, candidate: "Pooja Meena", position: "UI/UX Designer", date: "2026-10-17", status: "Under Review" },
-  { id: 9, candidate: "Arjun Singh", position: "Full Stack Developer", date: "2026-10-18", status: "Rejected" },
-  { id: 10, candidate: "Anjali Jain", position: "Data Analyst", date: "2026-10-18", status: "Shortlisted" },
-  { id: 11, candidate: "Karan Patel", position: "Python Developer", date: "2026-10-19", status: "Applied" },
-  { id: 12, candidate: "Simran Kaur", position: "Java Developer", date: "2026-10-19", status: "Interview" },
-  { id: 13, candidate: "Deepak Saini", position: "Cloud Engineer", date: "2026-10-20", status: "Hired" },
-  { id: 14, candidate: "Riya Agarwal", position: "Software Engineer", date: "2026-10-20", status: "Under Review" },
-  { id: 15, candidate: "Mohit Choudhary", position: "Data Scientist", date: "2026-10-20", status: "Rejected" },
-  { id: 16, candidate: "Kavita Sharma", position: "QA Engineer", date: "2026-10-21", status: "Applied" },
-  { id: 17, candidate: "Aakash Verma", position: "DevOps Engineer", date: "2026-10-21", status: "Shortlisted" },
-  { id: 18, candidate: "Meera Joshi", position: "Machine Learning Engineer", date: "2026-10-22", status: "Interview" },
-  { id: 19, candidate: "Rajat Mehta", position: "Product Designer", date: "2026-10-22", status: "Under Review" },
-  { id: 20, candidate: "Isha Kapoor", position: "Mobile App Developer", date: "2026-10-23", status: "Applied" },
+const stages = [{ id: "applied", label: "Applied", tint: "#f8fafc" }, { id: "interview", label: "Interview", tint: "#fffbeb" }, { id: "offered", label: "Offered", tint: "#f0fdf4" }];
+const jobs = ["Frontend Developer", "Backend Developer", "UI/UX Designer"];
+const initial = [
+  { id: 1, candidate: "Rahul Sharma", email: "rahul@example.com", job: "Frontend Developer", stage: "applied", date: "Oct 22, 2026", resume: "rahul-sharma-resume.pdf" },
+  { id: 2, candidate: "Priya Singh", email: "priya@example.com", job: "UI/UX Designer", stage: "interview", date: "Oct 21, 2026", resume: "priya-singh-portfolio.pdf" },
+  { id: 3, candidate: "Aman Verma", email: "aman@example.com", job: "Backend Developer", stage: "offered", date: "Oct 18, 2026", resume: "aman-verma-resume.docx" },
 ];
 
-const statusColors = {
-  Applied: "default",
-  "Under Review": "info",
-  Interview: "warning",
-  Hired: "success",
-  Rejected: "error",
-};
-
 export default function Applications() {
-  const [applications, setApplications] = useState(initialApplications);
-  const [filter, setFilter] = useState("All");
-
-  const filteredApplications =
-    filter === "All"
-      ? applications
-      : applications.filter((app) => app.status === filter);
-
-  const updateStatus = (id, status) => {
-    setApplications((previous) =>
-      previous.map((app) => (app.id === id ? { ...app, status } : app))
-    );
-  };
-
-  return (
-    <Box sx={{ p: { xs: 2, md: 3 }, backgroundColor: "#f6f7fb", minHeight: "100%" }}>
-      <Typography variant="h4" sx={{ fontWeight: 800, color: "#202544" }}>
-        Applications
-      </Typography>
-
-      <Typography sx={{ color: "#777f96", mt: 1, mb: 3 }}>
-        Track candidate applications and manage recruitment progress.
-      </Typography>
-
-      <Stack direction="row" spacing={2} sx={{ mb: 3, flexWrap: "wrap" }}>
-        {[
-          { label: "Total Applications", value: applications.length },
-          {
-            label: "Under Review",
-            value: applications.filter((a) => a.status === "Under Review").length,
-          },
-          {
-            label: "Interviews",
-            value: applications.filter((a) => a.status === "Interview").length,
-          },
-          {
-            label: "Hired",
-            value: applications.filter((a) => a.status === "Hired").length,
-          },
-        ].map((item) => (
-          <Card
-            key={item.label}
-            elevation={0}
-            sx={{
-              flex: "1 1 180px",
-              p: 2.5,
-              border: "1px solid #e8eaf2",
-              borderRadius: 3,
-            }}
-          >
-            <Typography sx={{ color: "#777f96", fontSize: 14 }}>
-              {item.label}
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 800, mt: 1, color: "#4f46e5" }}>
-              {item.value}
-            </Typography>
-          </Card>
-        ))}
-      </Stack>
-
-      <Card elevation={0} sx={{ p: 2, border: "1px solid #e8eaf2", borderRadius: 3 }}>
-        <TextField
-          select
-          label="Filter by status"
-          size="small"
-          value={filter}
-          onChange={(event) => setFilter(event.target.value)}
-          sx={{ minWidth: 220, mb: 2 }}
-        >
-          <MenuItem value="All">All Applications</MenuItem>
-          {["Applied", "Under Review", "Interview", "Hired", "Rejected"].map(
-            (status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            )
-          )}
-        </TextField>
-
-        {filteredApplications.length === 0 ? (
-          <Typography sx={{ p: 3, color: "#777f96" }}>
-            No applications found.
-          </Typography>
-        ) : (
-          <Stack spacing={1.5}>
-            {filteredApplications.map((app) => (
-              <Box
-                key={app.id}
-                sx={{
-                  p: 2,
-                  border: "1px solid #eef0f6",
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: { xs: "flex-start", md: "center" },
-                  justifyContent: "space-between",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
-              >
-                <Box>
-                  <Typography sx={{ fontWeight: 700, color: "#202544" }}>
-                    {app.candidate}
-                  </Typography>
-                  <Typography sx={{ color: "#777f96", fontSize: 14, mt: 0.5 }}>
-                    {app.position}
-                  </Typography>
-                  <Typography sx={{ color: "#777f96", fontSize: 13, mt: 0.5 }}>
-                    Applied on: {app.date}
-                  </Typography>
-                </Box>
-
-                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  <Chip
-                    label={app.status}
-                    color={statusColors[app.status] || "default"}
-                    size="small"
-                  />
-
-                  <TextField
-                    select
-                    size="small"
-                    label="Update status"
-                    value={app.status}
-                    onChange={(event) => updateStatus(app.id, event.target.value)}
-                    sx={{ minWidth: 155 }}
-                  >
-                    {["Applied", "Under Review", "Interview", "Hired", "Rejected"].map(
-                      (status) => (
-                        <MenuItem key={status} value={status}>
-                          {status}
-                        </MenuItem>
-                      )
-                    )}
-                  </TextField>
-                </Stack>
-              </Box>
-            ))}
-          </Stack>
-        )}
-      </Card>
-    </Box>
-  );
+  const [items, setItems] = useState(initial); const [filter, setFilter] = useState("All"); const [open, setOpen] = useState(false); const [file, setFile] = useState(null); const [success, setSuccess] = useState(false); const input = useRef(null);
+  const visible = useMemo(() => filter === "All" ? items : items.filter((item) => item.job === filter), [items, filter]);
+  const move = (id, stage) => setItems((previous) => previous.map((item) => item.id === id ? { ...item, stage } : item));
+  const submit = (event) => { event.preventDefault(); if (!file) return; setSuccess(true); setTimeout(() => { setOpen(false); setSuccess(false); setFile(null); }, 800); };
+  return <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1600, mx: "auto" }}>
+    <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ md: "center" }} spacing={2} sx={{ mb: 3 }}><Box><Typography variant="h4" fontWeight={800}>Application pipeline</Typography><Typography color="text.secondary" sx={{ mt: .5 }}>Move applicants through a clear recruitment workflow.</Typography></Box><Button variant="contained" startIcon={<UploadFileOutlinedIcon />} onClick={() => setOpen(true)} sx={{ bgcolor: "#4f46e5", textTransform: "none", alignSelf: { xs: "flex-start", md: "auto" } }}>Submit an application</Button></Stack>
+    <Card variant="outlined" sx={{ p: 2, mb: 3, borderRadius: 3, borderColor: "#e5eaf2" }}><Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }} justifyContent="space-between"><Typography fontWeight={700}>{visible.length} candidate{visible.length === 1 ? "" : "s"} in view</Typography><TextField select label="Job opening" size="small" value={filter} onChange={(event) => setFilter(event.target.value)} sx={{ minWidth: 230 }}><MenuItem value="All">All job openings</MenuItem>{jobs.map((job) => <MenuItem key={job} value={job}>{job}</MenuItem>)}</TextField></Stack></Card>
+    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr)" }, gap: 2 }}>{stages.map((stage, index) => { const cards = visible.filter((item) => item.stage === stage.id); return <Box key={stage.id} sx={{ bgcolor: stage.tint, border: "1px solid #e5eaf2", borderRadius: 3, p: 1.5, minHeight: 360 }}><Stack direction="row" justifyContent="space-between" sx={{ px: .5, pb: 1.5 }}><Typography fontWeight={800}>{stage.label}</Typography><Chip label={cards.length} size="small" /></Stack><Stack spacing={1.5}>{cards.map((item) => <Card key={item.id} elevation={0} sx={{ borderRadius: 2.5, border: "1px solid #e5e7eb" }}><CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}><Typography fontWeight={750}>{item.candidate}</Typography><Typography variant="body2" color="text.secondary">{item.email}</Typography><Chip label={item.job} size="small" sx={{ mt: 1.25, bgcolor: "#eef2ff", color: "#4338ca" }} /><Stack direction="row" spacing={.75} sx={{ mt: 1.5 }}><DescriptionOutlinedIcon sx={{ fontSize: 17, color: "#64748b" }} /><Typography variant="caption" noWrap>{item.resume}</Typography></Stack><Divider sx={{ my: 1.5 }} /><Stack direction="row" justifyContent="space-between" alignItems="center"><Typography variant="caption" color="text.secondary">Applied {item.date}</Typography>{index < stages.length - 1 && <Button size="small" endIcon={<ArrowForwardIcon />} onClick={() => move(item.id, stages[index + 1].id)} sx={{ textTransform: "none" }}>Move</Button>}</Stack></CardContent></Card>)}{cards.length === 0 && <Typography align="center" color="text.secondary" variant="body2" sx={{ py: 5 }}>No candidates in this stage</Typography>}</Stack></Box>; })}</Box>
+    <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}><Box component="form" onSubmit={submit}><DialogTitle fontWeight={800}>Submit your application</DialogTitle><DialogContent>{success && <Alert severity="success" sx={{ mb: 2 }}>Application submitted successfully.</Alert>}<Stack spacing={2} sx={{ pt: 1 }}><TextField select required label="Job opening" defaultValue=""><MenuItem value="" disabled>Select a job</MenuItem>{jobs.map((job) => <MenuItem key={job} value={job}>{job}</MenuItem>)}</TextField><TextField label="Cover letter (optional)" multiline minRows={4} inputProps={{ maxLength: 4000 }} helperText="Maximum 4,000 characters" /><Box onClick={() => input.current?.click()} sx={{ cursor: "pointer", border: "1px dashed #a5b4fc", borderRadius: 2, p: 2, textAlign: "center", bgcolor: "#fafaff" }}><UploadFileOutlinedIcon color="primary" /><Typography fontWeight={650}>{file ? file.name : "Upload your resume"}</Typography><Typography variant="caption" color="text.secondary">PDF or DOCX, up to 5 MB</Typography><input ref={input} hidden type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(event) => setFile(event.target.files?.[0] || null)} /></Box></Stack></DialogContent><DialogActions sx={{ p: 3 }}><Button onClick={() => setOpen(false)} color="inherit">Cancel</Button><Button type="submit" variant="contained" disabled={!file} sx={{ bgcolor: "#4f46e5" }}>Submit application</Button></DialogActions></Box></Dialog>
+  </Box>;
 }
