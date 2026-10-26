@@ -61,6 +61,14 @@ def get_supported_formats():
         "max_file_size_mb": 5
     }
 
+@app.get("/stats")
+def get_stats():
+    return {
+        "service": "AI-powered ATS Backend",
+        "total_endpoints": 4,
+        "environment": "development"
+    }
+
 @app.post("/analyze-resume", response_model=ATSResponse)
 async def analyze_resume(
     job_description: str = Form(...),
