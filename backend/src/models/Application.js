@@ -17,6 +17,18 @@ const applicationSchema = new mongoose.Schema({
     contentType: { type: String, required: true }, size: { type: Number, required: true },
   },
   coverLetter: { type: String, trim: true, maxlength: 4000, default: "" },
+  resumeText: { type: String, default: "", select: false },
+  analysis: {
+    status: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
+    provider: { type: String, default: "" },
+    matchScore: { type: Number, min: 0, max: 100, default: null },
+    summary: { type: String, trim: true, maxlength: 2000, default: "" },
+    matchedSkills: { type: [String], default: [] },
+    missingSkills: { type: [String], default: [] },
+    experienceHighlights: { type: [String], default: [] },
+    analyzedAt: { type: Date, default: null },
+    error: { type: String, default: "" },
+  },
   statusHistory: { type: [statusHistorySchema], default: [] },
 }, { timestamps: true });
 
