@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -34,6 +35,10 @@ app.add_middleware(
 class ATSResponse(BaseModel):
     status: str
     analysis: str
+
+class ErrorResponse(BaseModel):
+    status: str
+    message: str
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -69,7 +74,7 @@ def get_stats():
         "environment": "development"
     }
 
-@app.post("/analyze-resume", response_model=ATSResponse)
+@app.post("/analyze-resume", response_model=ATSResponse, responses={400: {"model": ErrorResponse}, 500: {"model": ErrorResponse}})
 async def analyze_resume(
     job_description: str = Form(...),
     file: UploadFile = File(...)
