@@ -51,6 +51,10 @@ async def log_requests(request: Request, call_next):
 def read_root():
     return {"message": "AI-powered ATS Backend is running successfully!"}
 
+@app.get("/ping")
+def ping_pong():
+    return {"ping": "pong"}
+
 @app.get("/health")
 def health_check():
     return {
@@ -70,7 +74,7 @@ def get_supported_formats():
 def get_stats():
     return {
         "service": "AI-powered ATS Backend",
-        "total_endpoints": 4,
+        "total_endpoints": 5,
         "environment": "development"
     }
 
