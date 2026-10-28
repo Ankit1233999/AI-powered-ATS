@@ -7,6 +7,7 @@ import { resumeUpload } from "../middleware/upload.js";
 import { getResumeDownloadUrl, storeResume } from "../config/storage.js";
 import { extractResumeText } from "../services/resumeParser.js";
 import { analyzeCandidate } from "../services/candidateAnalysis.js";
+import { sendStageNotification } from "../services/notificationService.js";
 
 const router = Router();
 const extension = (name) => name.includes(".") ? name.slice(name.lastIndexOf(".")).toLowerCase() : "";
@@ -48,10 +49,21 @@ router.get("/mine", requireAuth, requireRole("applicant"), async (req, res, next
 router.get("/manage", requireAuth, requireRole("recruiter"), async (req, res, next) => {
   try {
     const jobs = await Job.find({ createdBy: req.user.id }).select("_id");
-    const query = { job: { $in: jobs.map((job) => job.id) } };
-    if (req.query.jobId) query.job = req.query.jobId;
+    const jobIds = jobs.map((job) => job.id);
+    const query = { job: { $in: jobIds } };
+    if (req.query.jobId) {
+      if (!jobIds.includes(String(req.query.jobId))) return res.json({ applications: [], stages: PIPELINE_STAGES });
+      query.job = req.query.jobId;
+    }
     if (req.query.stage && PIPELINE_STAGES.includes(req.query.stage)) query.stage = req.query.stage;
-    const applications = await Application.find(query).populate("applicant", "name email").populate("job", "title department").sort({ createdAt: -1 });
+    const minScore = Number(req.query.minScore);
+    if (Number.isFinite(minScore) && minScore >= 0 && minScore <= 100) query["analysis.matchScore"] = { $gte: minScore };
+    const minExperience = Number(req.query.minExperience);
+    if (Number.isFinite(minExperience) && minExperience >= 0 && minExperience <= 80) query["analysis.yearsExperience"] = { $gte: minExperience };
+    const skills = String(req.query.skills || "").split(",").map((skill) => skill.trim()).filter(Boolean).slice(0, 10);
+    if (skills.length) query["analysis.matchedSkills"] = { $all: skills.map((skill) => new RegExp(`^${skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i")) };
+    const sort = req.query.sort === "newest" ? { createdAt: -1 } : { "analysis.matchScore": -1, createdAt: -1 };
+    const applications = await Application.find(query).populate("applicant", "name email").populate("job", "title department").sort(sort);
     res.json({ applications, stages: PIPELINE_STAGES });
   } catch (error) { next(error); }
 });
@@ -60,10 +72,15 @@ router.patch("/:id/stage", requireAuth, requireRole("recruiter"), async (req, re
   try {
     const { stage } = req.body;
     if (!PIPELINE_STAGES.includes(stage)) return res.status(400).json({ message: "Invalid pipeline stage." });
-    const application = await Application.findById(req.params.id).populate("job", "createdBy");
+    const application = await Application.findById(req.params.id).populate("job", "createdBy title").populate("applicant", "name email");
     if (!application || application.job.createdBy.toString() !== req.user.id) return res.status(404).json({ message: "Application not found." });
-    if (application.stage !== stage) { application.stage = stage; application.statusHistory.push({ stage, changedBy: req.user.id }); await application.save(); }
-    res.json({ application });
+    let notification = { sent: false, reason: "Stage was unchanged." };
+    if (application.stage !== stage) {
+      application.stage = stage; application.statusHistory.push({ stage, changedBy: req.user.id }); await application.save();
+      try { notification = await sendStageNotification({ applicant: application.applicant, job: application.job, stage }); }
+      catch (notificationError) { console.error("Application notification failed:", notificationError.message); notification = { sent: false, reason: "The stage was updated, but the email could not be sent." }; }
+    }
+    res.json({ application, notification });
   } catch (error) { next(error); }
 });
 
