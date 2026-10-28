@@ -26,6 +26,7 @@ const applicationSchema = new mongoose.Schema({
     matchedSkills: { type: [String], default: [] },
     missingSkills: { type: [String], default: [] },
     experienceHighlights: { type: [String], default: [] },
+    yearsExperience: { type: Number, min: 0, max: 80, default: null },
     analyzedAt: { type: Date, default: null },
     error: { type: String, default: "" },
   },
@@ -34,5 +35,6 @@ const applicationSchema = new mongoose.Schema({
 
 applicationSchema.index({ job: 1, applicant: 1 }, { unique: true });
 applicationSchema.index({ job: 1, stage: 1, createdAt: -1 });
+applicationSchema.index({ job: 1, "analysis.matchScore": -1, createdAt: -1 });
 applicationSchema.index({ applicant: 1, createdAt: -1 });
 export default mongoose.model("Application", applicationSchema);

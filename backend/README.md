@@ -31,3 +31,16 @@ Resumes are restricted to PDF or DOCX files up to 5 MB. Set `AWS_REGION` and `AW
 On application submission, the API extracts text from PDFs with `pdf-parse` and DOCX files with `mammoth`. It persists a structured result on the application: `matchScore`, `summary`, `matchedSkills`, `missingSkills`, `experienceHighlights`, provider, status, and timestamp. Raw resume text is stored with `select: false`, so it is never returned from normal application APIs.
 
 Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default `gpt-4o-mini`) to enable LLM analysis. Without it, a deterministic requirement-to-resume skills matcher supports local development without an external API key. Recruiters can rerun saved analysis with `POST /api/applications/:id/analyze`.
+
+## Week 4: ranking, notifications, and deployment security
+
+`GET /api/applications/manage` ranks candidates by match score by default and accepts recruiter-only filters: `minScore` (0–100), `skills` (comma-separated; every listed skill must match), `minExperience` (years), `stage`, and `sort=newest`. The candidate dashboard exposes these controls.
+
+Changing an application's stage sends the applicant a status email when SMTP is configured. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM`; without these settings the stage still updates safely and email is skipped.
+
+### Production checklist
+
+- Keep the S3 bucket private: enable Block Public Access, disable ACLs, and grant the API role only `s3:PutObject` and `s3:GetObject` on `resumes/*`.
+- Do not allow `s3:ListBucket` to the browser or make resume object URLs public. Downloads are generated server-side as five-minute signed URLs.
+- Require TLS for the API, restrict `CLIENT_ORIGIN` to deployed frontend origins, and use strong, rotated JWT, database, SMTP, AWS, and AI-provider secrets.
+- Configure an S3 lifecycle rule appropriate to your retention policy and test both authorized and unauthorized resume download before release.
