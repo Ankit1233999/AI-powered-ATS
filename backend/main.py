@@ -82,6 +82,10 @@ async def analyze_resume(
     if not api_key:
         raise HTTPException(status_code=500, detail="GEMINI_API_KEY is not configured.")
 
+    # Validate Job Description length
+    if not job_description.strip() or len(job_description.strip()) < 10:
+        raise HTTPException(status_code=400, detail="Job description must be at least 10 characters long.")
+
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
     
