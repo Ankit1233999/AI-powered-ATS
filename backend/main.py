@@ -59,14 +59,14 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "api_key_configured": api_key is not None
     }
 
 @app.get("/formats")
 def get_supported_formats():
     return {
-        "supported_formats": ["pdf"],
+        "supported_formats": ["pdf", "txt"],
         "max_file_size_mb": 5
     }
 
@@ -90,8 +90,9 @@ async def analyze_resume(
     if not job_description.strip() or len(job_description.strip()) < 10:
         raise HTTPException(status_code=400, detail="Job description must be at least 10 characters long.")
 
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
+    # Validate file extension (.pdf or .txt)
+    if not (file.filename.endswith(".pdf") or file.filename.endswith(".txt")):
+        raise HTTPException(status_code=400, detail="Only PDF and TXT files are allowed.")
     
     try:
         contents = await file.read()
@@ -100,17 +101,23 @@ async def analyze_resume(
         if len(contents) > 5 * 1024 * 1024:
             raise HTTPException(status_code=400, detail="File size exceeds the 5MB limit.")
 
-        pdf_file = io.BytesIO(contents)
-        
-        reader = PdfReader(pdf_file)
         resume_text = ""
-        for page in reader.pages:
-            text = page.extract_text()
-            if text:
-                resume_text += text + "\n"
+        
+        if file.filename.endswith(".pdf"):
+            pdf_file = io.BytesIO(contents)
+            reader = PdfReader(pdf_file)
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    resume_text += text + "\n"
+        elif file.filename.endswith(".txt"):
+            try:
+                resume_text = contents.decode("utf-8")
+            except UnicodeDecodeError:
+                resume_text = contents.decode("latin-1")
         
         if not resume_text.strip():
-            raise HTTPException(status_code=400, detail="Could not extract text from the PDF.")
+            raise HTTPException(status_code=400, detail="Could not extract text from the file.")
 
         model = genai.GenerativeModel("gemini-1.5-flash")
         
