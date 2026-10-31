@@ -12,3 +12,12 @@ test("fallback analysis scores matching skills and extracts years of experience"
   assert.deepEqual(result.matchedSkills, ["JavaScript", "MongoDB"]);
   assert.equal(result.matchScore, 78);
 });
+
+test("fallback analysis does not count a partial skill name as a match", async () => {
+  const priorKey = process.env.OPENAI_API_KEY;
+  delete process.env.OPENAI_API_KEY;
+  const result = await analyzeCandidate({ job: { description: "", requirements: ["React", "C++"] }, resumeText: "Built reactive interfaces and worked with C++." });
+  if (priorKey) process.env.OPENAI_API_KEY = priorKey;
+  assert.deepEqual(result.matchedSkills, ["C++"]);
+  assert.deepEqual(result.missingSkills, ["React"]);
+});
