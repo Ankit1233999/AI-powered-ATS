@@ -7,13 +7,19 @@ const yearsOfExperience = (text) => {
   const matches = [...text.matchAll(/\b(\d{1,2})(?:\s*\+)?\s*(?:years?|yrs?)\b/gi)].map((match) => Number(match[1]));
   return matches.length ? Math.max(...matches) : null;
 };
+const escapePattern = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const includesSkill = (text, skill) => {
+  const normalized = String(skill).trim();
+  if (!normalized) return false;
+  return new RegExp(`(^|[^a-z0-9])${escapePattern(normalized)}(?=$|[^a-z0-9])`, "i").test(text);
+};
 
 function heuristicAnalysis({ job, resumeText }) {
   const searchable = `${job.description} ${(job.requirements || []).join(" ")}`.toLowerCase();
   const resume = resumeText.toLowerCase();
   const requirements = cleanList(job.requirements?.length ? job.requirements : searchable.match(/[a-z][a-z+#.]{1,}/g) || []).slice(0, 20);
-  const matchedSkills = requirements.filter((skill) => resume.includes(skill.toLowerCase()));
-  const missingSkills = requirements.filter((skill) => !resume.includes(skill.toLowerCase())).slice(0, 8);
+  const matchedSkills = requirements.filter((skill) => includesSkill(resume, skill));
+  const missingSkills = requirements.filter((skill) => !includesSkill(resume, skill)).slice(0, 8);
   const yearsExperience = yearsOfExperience(resumeText);
   const hasExperience = yearsExperience !== null;
   const score = requirements.length ? 30 + (matchedSkills.length / requirements.length) * 65 + (hasExperience ? 5 : 0) : 50;

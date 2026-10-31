@@ -13,6 +13,7 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use((req, res) => res.status(404).json({ message: "Route not found." }));
 app.use((error, _req, res, _next) => {
+  if (error?.code === 11000) return res.status(409).json({ message: "A record with those details already exists." });
   if (error.name === "ValidationError" || error.name === "MulterError") return res.status(400).json({ message: error.message });
   if (error.message === "Only PDF and DOCX resumes are accepted.") return res.status(400).json({ message: error.message });
   if (error.name === "CastError") return res.status(404).json({ message: "Resource not found." });
