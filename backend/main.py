@@ -4,8 +4,8 @@ import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from typing import List
 from dotenv import load_dotenv
 import google.generativeai as genai
 from pypdf import PdfReader
@@ -34,7 +34,10 @@ app.add_middleware(
 
 class ATSResponse(BaseModel):
     status: str
-    analysis: str
+    match_score: str
+    strengths: List[str]
+    gaps: List[str]
+    recommendation: str
 
 class ErrorResponse(BaseModel):
     status: str
@@ -59,7 +62,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "api_key_configured": api_key is not None
     }
 
@@ -122,9 +125,13 @@ async def analyze_resume(
         model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
-        You are an expert HR recruiter. Analyze the following resume against the job description.
-        Provide a match percentage and brief feedback including strengths and gaps.
-        
+        You are an expert HR recruiter and ATS system. Analyze the following resume against the job description.
+        Provide your evaluation strictly in the following format:
+        MATCH_SCORE: [e.g., 85%]
+        STRENGTHS: [Comma-separated list of top strengths]
+        GAPS: [Comma-separated list of missing skills or gaps]
+        RECOMMENDATION: [Brief summary and hiring recommendation]
+
         Job Description: {job_description}
         
         Resume Text:
@@ -132,9 +139,35 @@ async def analyze_resume(
         """
         
         response = model.generate_content(prompt)
+        text_res = response.text
+
+        # Simple parsing logic for structured response
+        match_score = "N/A"
+        strengths = []
+        gaps = []
+        recommendation = text_res
+
+        for line in text_res.split("\n"):
+            if line.startswith("MATCH_SCORE:"):
+                match_score = line.replace("MATCH_SCORE:", "").strip()
+            elif line.startswith("STRENGTHS:"):
+                strengths = [s.strip() for s in line.replace("STRENGTHS:", "").strip().strip("[]").split(",") if s.strip()]
+            elif line.startswith("GAPS:"):
+                gaps = [g.strip() for g in line.replace("GAPS:", "").strip().strip("[]").split(",") if g.strip()]
+            elif line.startswith("RECOMMENDATION:"):
+                recommendation = line.replace("RECOMMENDATION:", "").strip()
+
+        if not strengths:
+            strengths = ["Analyzed from resume"]
+        if not gaps:
+            gaps = ["Review full recommendation"]
+
         return {
             "status": "success",
-            "analysis": response.text
+            "match_score": match_score,
+            "strengths": strengths,
+            "gaps": gaps,
+            "recommendation": recommendation
         }
     
     except HTTPException as he:
