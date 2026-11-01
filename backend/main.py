@@ -1,5 +1,6 @@
 import os
 import io
+import re
 import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
@@ -43,6 +44,14 @@ class ErrorResponse(BaseModel):
     status: str
     message: str
 
+def clean_resume_text(text: str) -> str:
+    """Helper function to clean extracted text from whitespace and noise."""
+    if not text:
+        return ""
+    # Remove excessive newlines and spaces
+    cleaned = re.sub(r'\s+', ' ', text)
+    return cleaned.strip()
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     logger.info(f"Incoming request: {request.method} {request.url}")
@@ -62,7 +71,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "api_key_configured": api_key is not None
     }
 
@@ -104,7 +113,7 @@ async def analyze_resume(
         if len(contents) > 5 * 1024 * 1024:
             raise HTTPException(status_code=400, detail="File size exceeds the 5MB limit.")
 
-        resume_text = ""
+        raw_text = ""
         
         if file.filename.endswith(".pdf"):
             pdf_file = io.BytesIO(contents)
@@ -112,14 +121,17 @@ async def analyze_resume(
             for page in reader.pages:
                 text = page.extract_text()
                 if text:
-                    resume_text += text + "\n"
+                    raw_text += text + "\n"
         elif file.filename.endswith(".txt"):
             try:
-                resume_text = contents.decode("utf-8")
+                raw_text = contents.decode("utf-8")
             except UnicodeDecodeError:
-                resume_text = contents.decode("latin-1")
+                raw_text = contents.decode("latin-1")
         
-        if not resume_text.strip():
+        # Sanitize and clean extracted text
+        resume_text = clean_resume_text(raw_text)
+
+        if not resume_text:
             raise HTTPException(status_code=400, detail="Could not extract text from the file.")
 
         model = genai.GenerativeModel("gemini-1.5-flash")
@@ -141,7 +153,7 @@ async def analyze_resume(
         response = model.generate_content(prompt)
         text_res = response.text
 
-        # Simple parsing logic for structured response
+        # Parsing logic for structured response
         match_score = "N/A"
         strengths = []
         gaps = []
