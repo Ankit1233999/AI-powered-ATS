@@ -1,6 +1,7 @@
 import os
 import io
 import re
+import time
 import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
@@ -48,15 +49,21 @@ def clean_resume_text(text: str) -> str:
     """Helper function to clean extracted text from whitespace and noise."""
     if not text:
         return ""
-    # Remove excessive newlines and spaces
     cleaned = re.sub(r'\s+', ' ', text)
     return cleaned.strip()
 
 @app.middleware("http")
-async def log_requests(request: Request, call_next):
+async def add_process_time_header(request: Request, call_next):
+    """Middleware to measure request processing time and log details."""
+    start_time = time.time()
     logger.info(f"Incoming request: {request.method} {request.url}")
+    
     response = await call_next(request)
-    logger.info(f"Response status: {response.status_code}")
+    
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = f"{process_time:.4f} sec"
+    logger.info(f"Response status: {response.status_code} | Time taken: {process_time:.4f}s")
+    
     return response
 
 @app.get("/")
@@ -71,7 +78,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.3.0",
+        "version": "1.4.0",
         "api_key_configured": api_key is not None
     }
 
