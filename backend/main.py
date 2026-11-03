@@ -2,6 +2,7 @@ import os
 import io
 import re
 import time
+import uuid
 import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
@@ -53,16 +54,20 @@ def clean_resume_text(text: str) -> str:
     return cleaned.strip()
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    """Middleware to measure request processing time and log details."""
+async def add_correlation_id_and_logging(request: Request, call_next):
+    """Middleware to assign a unique request ID, measure time, and log details."""
+    request_id = str(uuid.uuid4())
     start_time = time.time()
-    logger.info(f"Incoming request: {request.method} {request.url}")
+    
+    logger.info(f"[{request_id}] Incoming request: {request.method} {request.url}")
     
     response = await call_next(request)
     
     process_time = time.time() - start_time
+    response.headers["X-Request-ID"] = request_id
     response.headers["X-Process-Time"] = f"{process_time:.4f} sec"
-    logger.info(f"Response status: {response.status_code} | Time taken: {process_time:.4f}s")
+    
+    logger.info(f"[{request_id}] Response status: {response.status_code} | Time taken: {process_time:.4f}s")
     
     return response
 
@@ -78,7 +83,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.4.0",
+        "version": "1.5.0",
         "api_key_configured": api_key is not None
     }
 
