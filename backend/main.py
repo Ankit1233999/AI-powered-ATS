@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
 from dotenv import load_dotenv
@@ -61,7 +62,14 @@ async def add_correlation_id_and_logging(request: Request, call_next):
     
     logger.info(f"[{request_id}] Incoming request: {request.method} {request.url}")
     
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        logger.error(f"[{request_id}] Unhandled exception: {str(exc)}")
+        return JSONResponse(
+            status_code=500,
+            content={"status": "error", "message": "Internal server error occurred."}
+        )
     
     process_time = time.time() - start_time
     response.headers["X-Request-ID"] = request_id
@@ -83,7 +91,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.5.0",
+        "version": "1.6.0",
         "api_key_configured": api_key is not None
     }
 
@@ -194,6 +202,7 @@ async def analyze_resume(
             "recommendation": recommendation
         }
     
+    zones_except = HTTPException
     except HTTPException as he:
         raise he
     except Exception as e:
