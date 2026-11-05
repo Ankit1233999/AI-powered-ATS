@@ -42,6 +42,7 @@ class ATSResponse(BaseModel):
     strengths: List[str]
     gaps: List[str]
     recommendation: str
+    resume_word_count: int
 
 class ErrorResponse(BaseModel):
     status: str
@@ -91,7 +92,7 @@ def ping_pong():
 def health_check():
     return {
         "status": "healthy",
-        "version": "1.6.0",
+        "version": "1.7.0",
         "api_key_configured": api_key is not None
     }
 
@@ -154,6 +155,8 @@ async def analyze_resume(
         if not resume_text:
             raise HTTPException(status_code=400, detail="Could not extract text from the file.")
 
+        resume_word_count = len(resume_text.split())
+
         model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""
@@ -199,10 +202,10 @@ async def analyze_resume(
             "match_score": match_score,
             "strengths": strengths,
             "gaps": gaps,
-            "recommendation": recommendation
+            "recommendation": recommendation,
+            "resume_word_count": resume_word_count
         }
     
-    zones_except = HTTPException
     except HTTPException as he:
         raise he
     except Exception as e:
